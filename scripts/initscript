@@ -1,0 +1,58 @@
+#!/bin/bash
+### BEGIN INIT INFO
+# Provides:          go-gin-webapp
+# Required-Start:    $local_fs $remote_fs $network $syslog
+# Required-Stop:     $local_fs $remote_fs $network $syslog
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Zmon metric aggregator
+# Description:       Macaque aggregates data to check with monitoring tools like zmon, nagios, ...
+### END INIT INFO
+set -ue
+
+NAME="go-gin-webapp"
+DESC="go-gin-webapp"
+
+. /lib/lsb/init-functions
+
+PID=/var/run/${NAME}.pid
+LOGDIR=/var/log/$NAME
+
+start() {
+  test -d $LOGDIR || mkdir -p $LOGDIR
+  start-stop-daemon --start --background --quiet \
+                    --pidfile "$PID" --make-pidfile \
+                    --exec /usr/local/bin/$NAME -- --log_dir=$LOGDIR
+}
+
+stop() {
+  start-stop-daemon --stop --quiet --pidfile "$PID"
+}
+
+case "${1-}" in
+  start)
+    echo -n "Starting $DESC: "
+    start
+    echo "$NAME."
+    ;;
+  stop)
+    echo -n "Stopping $DESC: "
+    stop
+    echo "$NAME."
+    ;;
+  restart)
+    echo -n "Restarting $DESC: "
+    stop
+    sleep 1
+    start
+    echo "$NAME."
+    ;;
+  status)
+    status_of_proc -p "$PID" "$NAME" "$NAME"
+    ;;
+  *)
+    echo "Usage: $0 {start|stop|restart|status}" >&2
+    exit 1
+    ;;
+esac
+
