@@ -1,0 +1,5 @@
+{
+	"ImportPath": "github.com/szuecs/go-gin-webapp",
+	"GoVersion": "go1.6",
+	"Deps": []
+}
