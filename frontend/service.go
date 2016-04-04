@@ -31,11 +31,18 @@ type ServiceConfig struct {
 var cfg conf.Config
 
 // Service is the main struct
-type Service struct{}
+type Service struct {
+	Healthy bool
+}
+
+func (svc *Service) checkDependencies() bool {
+	// TODO: you may want to check if you can connect to your dependencies here
+	return true
+}
 
 // Run is the main function of the server. It bootstraps the service
 // and creates the route endpoints.
-func (svc *Service) Run(config ServiceConfig) error {
+func (svc *Service) Run(config *ServiceConfig) error {
 	cfg = *config.Config
 
 	// init gin
@@ -60,12 +67,13 @@ func (svc *Service) Run(config ServiceConfig) error {
 	//
 	//  Handlers
 	//
+	router.GET("/health", svc.HealthHandler)
 	if cfg.Oauth2Enabled {
 		// authenticated routes
-		private.GET("/", svc.rootHandler)
+		private.GET("/", svc.RootHandler)
 	} else {
 		// public routes
-		router.GET("/", svc.rootHandler)
+		router.GET("/", svc.RootHandler)
 	}
 
 	// TLS config
@@ -82,6 +90,12 @@ func (svc *Service) Run(config ServiceConfig) error {
 		Handler:   router,
 		TLSConfig: &tlsConfig,
 	}
+
+	if svc.checkDependencies() {
+		svc.Healthy = true
+	}
+
+	// start server
 	if config.Httponly {
 		err := serve.ListenAndServe()
 		if err != nil {

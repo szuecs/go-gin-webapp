@@ -70,45 +70,55 @@ func main() {
 		os.Exit(0)
 	}
 
-	fmt.Printf("serverConfig: %+v\n", serverConfig)
+	httpOnly := IsHTTPOnly(serverConfig)
+	var cfg *frontend.ServiceConfig
+	cfg, err := GetServiceConfig(serverConfig, httpOnly)
 
-	// default https, if cert and key are found
-	var err error
-	httpOnly := false
-	if _, err = os.Stat(serverConfig.TLSCertfilePath); os.IsNotExist(err) {
-		glog.Warningf("WARN: No Certfile found %s\n", serverConfig.TLSCertfilePath)
-		httpOnly = true
-	} else if _, err = os.Stat(serverConfig.TLSKeyfilePath); os.IsNotExist(err) {
-		glog.Warningf("WARN: No Keyfile found %s\n", serverConfig.TLSKeyfilePath)
-		httpOnly = true
+	svc := frontend.Service{
+		Healthy: false,
 	}
-	var keypair tls.Certificate
-	if httpOnly {
-		keypair = tls.Certificate{}
-	} else {
-		keypair, err = tls.LoadX509KeyPair(serverConfig.TLSCertfilePath, serverConfig.TLSKeyfilePath)
-		if err != nil {
-			fmt.Printf("ERR: Could not load X509 KeyPair, caused by: %s\n", err)
-			os.Exit(1)
-		}
-	}
-
-	var oauth2Endpoint = oauth2.Endpoint{
-		AuthURL:  serverConfig.AuthURL,
-		TokenURL: serverConfig.TokenURL,
-	}
-
-	// configure service
-	cfg := frontend.ServiceConfig{
-		Config:          serverConfig,
-		OAuth2Endpoints: oauth2Endpoint,
-		CertKeyPair:     keypair,
-		Httponly:        httpOnly,
-	}
-	svc := frontend.Service{}
 	err = svc.Run(cfg)
 	if err != nil {
 		fmt.Printf("ERR: Could not start service, caused by: %s\n", err)
 		os.Exit(1)
 	}
+}
+
+// IsHTTPOnly defaults to false and returns true if it can not read Cert or Key.
+func IsHTTPOnly(cfg *conf.Config) bool {
+	var err error
+	if _, err = os.Stat(cfg.TLSCertfilePath); os.IsNotExist(err) {
+		glog.Warningf("WARN: No Certfile found %s\n", cfg.TLSCertfilePath)
+		return true
+	} else if _, err = os.Stat(cfg.TLSKeyfilePath); os.IsNotExist(err) {
+		glog.Warningf("WARN: No Keyfile found %s\n", cfg.TLSKeyfilePath)
+		return true
+	}
+	return false
+}
+
+// GetServiceConfig returns frontend.ServiceConfig. err is nil unless
+// tls.LoadX509KeyPair failed to load configured Cert or Key.
+func GetServiceConfig(cfg *conf.Config, httpOnly bool) (*frontend.ServiceConfig, error) {
+	var keypair tls.Certificate
+	var err error
+	if !httpOnly {
+		keypair, err = tls.LoadX509KeyPair(cfg.TLSCertfilePath, cfg.TLSKeyfilePath)
+		if err != nil {
+			return nil, fmt.Errorf("ERR: Could not load X509 KeyPair, caused by: %s\n", err)
+
+		}
+	}
+
+	var oauth2Endpoint = oauth2.Endpoint{
+		AuthURL:  cfg.AuthURL,
+		TokenURL: cfg.TokenURL,
+	}
+
+	return &frontend.ServiceConfig{
+		Config:          cfg,
+		OAuth2Endpoints: oauth2Endpoint,
+		CertKeyPair:     keypair,
+		Httponly:        httpOnly,
+	}, nil
 }
