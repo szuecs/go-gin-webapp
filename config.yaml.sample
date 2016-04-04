@@ -1,5 +1,5 @@
 ---
-debugEnabled: true
+debugEnabled: false
 oauth2Enabled: false
 tlsCertfilePath: /path/to/your/certfile
 tlsKeyfilePath: /path/to/your/keyfile
