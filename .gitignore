@@ -6,6 +6,14 @@
 # Folders
 _obj
 _test
+build
+
+# profile data
+*.prof
+*.cpu
+*.mem
+bench.old
+bench.new
 
 # Architecture specific extensions/prefixes
 *.[568vq]
@@ -21,4 +29,3 @@ _testmain.go
 
 *.exe
 *.test
-*.prof
