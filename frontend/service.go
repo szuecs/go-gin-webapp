@@ -9,6 +9,7 @@ import (
 
 	"gopkg.in/mcuadros/go-monitor.v1/aspects"
 
+	"github.com/DeanThompson/ginpprof"
 	"github.com/gin-gonic/gin"
 	"github.com/golang/glog"
 	"github.com/szuecs/go-gin-webapp/conf"
@@ -69,7 +70,7 @@ func (svc *Service) Run(config *ServiceConfig) error {
 	//
 	router.GET("/health", svc.HealthHandler)
 	if cfg.Oauth2Enabled {
-		// authenticated routes
+		// authenticated and authorized routes
 		private.GET("/", svc.RootHandler)
 	} else {
 		// public routes
@@ -89,6 +90,10 @@ func (svc *Service) Run(config *ServiceConfig) error {
 		Addr:      fmt.Sprintf(":%d", cfg.Port),
 		Handler:   router,
 		TLSConfig: &tlsConfig,
+	}
+
+	if cfg.ProfilingEnabled {
+		ginpprof.Wrapper(router)
 	}
 
 	if svc.checkDependencies() {

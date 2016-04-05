@@ -13,13 +13,14 @@ import (
 // Config is the configuration struct. The config file config.yaml
 // will unmarshaled to this struct.
 type Config struct {
-	Oauth2Enabled    bool
 	DebugEnabled     bool
+	Oauth2Enabled    bool
+	ProfilingEnabled bool
 	Port             int
 	MonitorPort      int
+	LogFlushInterval time.Duration
 	TLSCertfilePath  string
 	TLSKeyfilePath   string
-	LogFlushInterval time.Duration
 	AuthURL          string
 	TokenURL         string
 	AuthorizedTeams  []AccessTuple

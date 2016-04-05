@@ -1,0 +1,51 @@
+#!/bin/bash
+## this is called by the Makefile target test.profile.cpu
+
+if [ ! $2 ]
+then
+  echo "$0 <seconds> <endpoint-path>"
+  exit 1
+fi
+
+CURL_ENDPOINT=http://127.0.0.1:8080${2}
+ENDPOINT=http://127.0.0.1:8080
+N=$1
+PIDFILE=/run/lock/gin-pprof.pid
+
+# run service
+build/go-gin-webapp -profile &
+echo $! >$PIDFILE
+sleep 1 # wait to start service
+
+# connect and run profiler for 30s
+go tool pprof -seconds=$N ${ENDPOINT}/debug/pprof/profile &
+
+T=$(tempfile)
+test -f $T
+
+function stop_client() {
+  sleep $N
+  echo ""
+  echo "*** shutdown client..."
+  rm -f $T
+}
+stop_client &
+
+# run client to use your endpoint
+for j in {01..99}
+do
+  for i in {01..99}
+  do
+    test -f $T || break 2 # break outer loop if tempfile does not exist
+    curl -s ${CURL_ENDPOINT} >/dev/null
+  done
+  echo -n "."
+done
+echo "*** client stopped."
+
+prof_file=$(ls -1tr $HOME/pprof | tail -n 1)
+go tool pprof build/go-gin-webapp $HOME/pprof/$prof_file
+
+echo ""
+kill $(cat $PIDFILE)
+rm -f $PIDFILE
