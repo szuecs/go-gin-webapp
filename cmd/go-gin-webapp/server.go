@@ -7,9 +7,8 @@ import (
 	"os"
 	"path"
 
-	"github.com/golang/glog"
+	"github.com/szuecs/go-gin-webapp/api"
 	"github.com/szuecs/go-gin-webapp/conf"
-	"github.com/szuecs/go-gin-webapp/frontend"
 	"golang.org/x/oauth2"
 )
 
@@ -72,10 +71,10 @@ func main() {
 	}
 
 	httpOnly := IsHTTPOnly(serverConfig)
-	var cfg *frontend.ServiceConfig
+	var cfg *api.ServiceConfig
 	cfg, err := GetServiceConfig(serverConfig, httpOnly)
 
-	svc := frontend.Service{
+	svc := api.Service{
 		Healthy: false,
 	}
 	err = svc.Run(cfg)
@@ -89,18 +88,18 @@ func main() {
 func IsHTTPOnly(cfg *conf.Config) bool {
 	var err error
 	if _, err = os.Stat(cfg.TLSCertfilePath); os.IsNotExist(err) {
-		glog.Warningf("WARN: No Certfile found %s\n", cfg.TLSCertfilePath)
+		fmt.Printf("WARN: No Certfile found %s\n", cfg.TLSCertfilePath)
 		return true
 	} else if _, err = os.Stat(cfg.TLSKeyfilePath); os.IsNotExist(err) {
-		glog.Warningf("WARN: No Keyfile found %s\n", cfg.TLSKeyfilePath)
+		fmt.Printf("WARN: No Keyfile found %s\n", cfg.TLSKeyfilePath)
 		return true
 	}
 	return false
 }
 
-// GetServiceConfig returns frontend.ServiceConfig. err is nil unless
+// GetServiceConfig returns api.ServiceConfig. err is nil unless
 // tls.LoadX509KeyPair failed to load configured Cert or Key.
-func GetServiceConfig(cfg *conf.Config, httpOnly bool) (*frontend.ServiceConfig, error) {
+func GetServiceConfig(cfg *conf.Config, httpOnly bool) (*api.ServiceConfig, error) {
 	var keypair tls.Certificate
 	var err error
 	if !httpOnly {
@@ -116,7 +115,7 @@ func GetServiceConfig(cfg *conf.Config, httpOnly bool) (*frontend.ServiceConfig,
 		TokenURL: cfg.TokenURL,
 	}
 
-	return &frontend.ServiceConfig{
+	return &api.ServiceConfig{
 		Config:          cfg,
 		OAuth2Endpoints: oauth2Endpoint,
 		CertKeyPair:     keypair,

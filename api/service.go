@@ -1,4 +1,4 @@
-package frontend
+package api
 
 import (
 	"crypto/rand"
@@ -29,7 +29,7 @@ type ServiceConfig struct {
 	Httponly        bool
 }
 
-var cfg conf.Config
+var cfg *conf.Config
 
 // Service is the main struct
 type Service struct {
@@ -41,10 +41,21 @@ func (svc *Service) checkDependencies() bool {
 	return true
 }
 
+func (svc *Service) setAccessTuples(cfg *conf.Config) {
+	for _, t := range cfg.AuthorizedTeams {
+		tp := zalando.AccessTuple{
+			Realm: t.Realm,
+			Uid:   t.UID,
+			Cn:    t.Cn}
+		zalando.AccessTuples = append(zalando.AccessTuples, tp)
+	}
+
+}
+
 // Run is the main function of the server. It bootstraps the service
 // and creates the route endpoints.
 func (svc *Service) Run(config *ServiceConfig) error {
-	cfg = *config.Config
+	cfg = config.Config
 
 	// init gin
 	if !cfg.DebugEnabled {
@@ -54,15 +65,29 @@ func (svc *Service) Run(config *ServiceConfig) error {
 	// Middleware
 	router := gin.New()
 	router.Use(ginglog.Logger(cfg.LogFlushInterval))
+	// pass your custom aspects here to get them available
 	router.Use(gomonitor.Metrics(cfg.MonitorPort, []aspects.Aspect{}))
 	router.Use(gin.Recovery())
 
 	// OAuth2 secured if conf.Oauth2Enabled is set
 	var private *gin.RouterGroup
 	if cfg.Oauth2Enabled {
-		zalando.AccessTuples = []zalando.AccessTuple{{"employees", "sszuecs", "Sandor Szücs"}, {"employees", "njuettner", "Nick Jüttner"}, {"employees", "rdifazio", "Raffaele Di Fazio"}}
+		zalando.AccessTuples = []zalando.AccessTuple{}
 		private = router.Group("")
-		private.Use(ginoauth2.Auth(zalando.UidCheck, config.OAuth2Endpoints))
+
+		if cfg.AuthorizedTeams != nil {
+			glog.Infof("OAuth2 team authorization, grant to: %s", cfg.AuthorizedTeams)
+			svc.setAccessTuples(cfg)
+			private.Use(ginoauth2.Auth(zalando.GroupCheck, config.OAuth2Endpoints))
+
+		} else if cfg.AuthorizedUsers != nil {
+			glog.Infof("OAuth2 user authorization, grant to: %s", cfg.AuthorizedUsers)
+			svc.setAccessTuples(cfg)
+			private.Use(ginoauth2.Auth(zalando.UidCheck, config.OAuth2Endpoints))
+
+		} else {
+			glog.Fatal("You want to start with OAuth2, but have no valid configuration to build access tuples.")
+		}
 	}
 
 	//
@@ -85,7 +110,7 @@ func (svc *Service) Run(config *ServiceConfig) error {
 		tlsConfig.Rand = rand.Reader // Strictly not necessary, should be default
 	}
 
-	// run frontend server
+	// run api server
 	serve := &http.Server{
 		Addr:      fmt.Sprintf(":%d", cfg.Port),
 		Handler:   router,
