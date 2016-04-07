@@ -23,16 +23,6 @@ var Githash = "Not set"
 // Version is used to store the tagged version of the build
 var Version = "Not set"
 
-var conf struct {
-	AccessUser     string `envconfig:"optional"`
-	AccessPassword string `envconfig:"optional"`
-	AccessToken    string `envconfig:"optional"`
-	OAuth2Endpoint struct {
-		AuthURL      string `envconfig:"optional"`
-		TokenInfoURL string `envconfig:"optional"`
-	}
-}
-
 func main() {
 	var (
 		debug       = kingpin.Flag("debug", "enable debug mode").Default("false").Bool()
