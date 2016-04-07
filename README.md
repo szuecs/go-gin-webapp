@@ -31,12 +31,20 @@ To create a new web application, you can do the following steps
     cd $DST
     grep -rl go-gin-webapp | xargs sed -i "s@go-gin-webapp@$APP@g"
     mv cmd/go-gin-webapp cmd/$APP
+    mv cmd/go-gin-webapp-cli cmd/${APP}-cli
 
 
 The main package and function of the service is in
 cmd/$APP/server.go. It parses flags and merges the configuration to
-start the service.
+start the service. A client main package can be find in
+cmd/$APP-cli/client.go.
 
 The api package bootstraps the http(s) microservice, middleware,
 registers the path specific handlers and you implement handlers
 (similar to Controller in MVC) there.
+
+The client package implements a client, that calls your api endpoints.
+
+Configuring your service and client, use the following make target:
+
+    % make config
