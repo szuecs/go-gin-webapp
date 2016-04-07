@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"os/user"
 	"strings"
 
 	"gopkg.in/resty.v0"
@@ -24,8 +25,32 @@ type Client struct {
 var homeDirectories = []string{"HOME", "USERPROFILES"}
 var tokenFilename = ".gin-oauth-token"
 
+// GetUsername returns the configured user, that can be set as parameter.
+func (cli *Client) GetUsername(username string) string {
+	if username != "" {
+		cli.Config.Username = strings.TrimSpace(username)
+	}
+
+	// maybe user is not configured
+	if cli.Config.Username == "" {
+		// guess user from system
+		user, err := user.Current()
+		if err == nil {
+			cli.Config.Username = strings.TrimSpace(user.Username)
+		}
+	}
+
+	// make sure we have a username
+	if cli.Config.Username == "" {
+		fmt.Println("Can not find user to authenticate with.")
+		os.Exit(2)
+	}
+	return cli.Config.Username
+}
+
 //RenewAccessToken is used to get a new OAuth2 access token
-func (bc *Client) RenewAccessToken(username string) {
+func (cli *Client) RenewAccessToken() {
+	username := cli.Config.Username
 	if username == "" {
 		reader := bufio.NewReader(os.Stdin)
 		fmt.Print("Enter your username: ")
@@ -39,9 +64,9 @@ func (bc *Client) RenewAccessToken(username string) {
 		os.Exit(1)
 	}
 	password := strings.TrimSpace(string(bytePassword))
-	u, err := url.Parse(bc.Config.OauthURL)
+	u, err := url.Parse(cli.Config.OauthURL)
 	if err != nil {
-		fmt.Printf("ERR: Could not parse given Auth URL: %s\n", bc.Config.OauthURL)
+		fmt.Printf("ERR: Could not parse given Auth URL: %s\n", cli.Config.OauthURL)
 		os.Exit(1)
 	}
 	authURLStr := fmt.Sprintf("https://%s%s%s%s", u.Host, u.Path, u.RawQuery, u.Fragment)
@@ -64,8 +89,8 @@ func (bc *Client) RenewAccessToken(username string) {
 	}
 
 	if len(respBody) > 0 && res.StatusCode == 200 {
-		bc.AccessToken = string(respBody)
-		fmt.Printf("SUCCESS. Your access token is stored in .chimp-token in your home directory.\n")
+		cli.AccessToken = string(respBody)
+		fmt.Printf("SUCCESS. Your access token is stored in %s in your home directory.\n", tokenFilename)
 		//store token to file
 		var homeDir string
 		for _, home := range homeDirectories {
@@ -75,15 +100,15 @@ func (bc *Client) RenewAccessToken(username string) {
 		}
 		tokenFileName := fmt.Sprintf("%s/%s", homeDir, tokenFilename)
 		f, _ := os.Create(tokenFileName)
-		_, _ = f.WriteString(strings.TrimSpace(bc.AccessToken)) //not important if doens't work, we'll try again next time
+		_, _ = f.WriteString(strings.TrimSpace(cli.AccessToken)) //not important if doens't work, we'll try again next time
 	} else {
 		fmt.Printf("ERR: %d - %s\n", res.StatusCode, respBody)
 	}
 }
 
 //GetAccessToken sets the access token inside the request
-func (bc *Client) GetAccessToken(username string) {
-	if bc.Config.Oauth2Enabled {
+func (cli *Client) GetAccessToken() {
+	if cli.Config.Oauth2Enabled {
 		//before trying to get the token I try to read the old one
 		var homeDir string
 		for _, home := range homeDirectories {
@@ -100,18 +125,18 @@ func (bc *Client) GetAccessToken(username string) {
 		} else {
 			oldToken = strings.TrimSpace(string(data))
 		}
-		bc.AccessToken = oldToken
+		cli.AccessToken = oldToken
 	}
 }
 
 // Get does HTTP GET to targetURL and print the result to STDOUT.
-func (bc *Client) Get(targetURL *url.URL) {
+func (cli *Client) Get(targetURL *url.URL) {
 	var resp *resty.Response
 	var err error
 
-	if bc.Config.Oauth2Enabled {
+	if cli.Config.Oauth2Enabled {
 		resp, err = resty.R().
-			SetHeader("Authorization", fmt.Sprintf("Bearer %s", bc.AccessToken)).
+			SetHeader("Authorization", fmt.Sprintf("Bearer %s", cli.AccessToken)).
 			Get(targetURL.String())
 	} else {
 		resp, err = resty.R().Get(targetURL.String())

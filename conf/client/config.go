@@ -10,10 +10,11 @@ import (
 	"github.com/spf13/viper"
 )
 
-//ClientConfig is the configuration from the client. Usually loaded from config files.
+// ClientConfig is the configuration from the client. Usually loaded from config files.
 type ClientConfig struct {
-	Url           string   //URL to our service endpoint set by the user
-	RealUrl       *url.URL //URL to our service endpoint parsed from Url
+	URL           string   //URL to our service endpoint set by the user
+	RealURL       *url.URL //RealURL to our service endpoint parsed from URL
+	Debug         bool     //true if Debug is enabled
 	Oauth2Enabled bool     //true if oauth2 is enabled
 	OauthURL      string   //the oauth2 endpoint to be used
 	TokenURL      string   //the oauth2 token info endpoint
