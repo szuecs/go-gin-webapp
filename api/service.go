@@ -106,7 +106,6 @@ func (svc *Service) Run(config *ServiceConfig) error {
 	tlsConfig := tls.Config{}
 	if !config.Httponly {
 		tlsConfig.Certificates = []tls.Certificate{config.CertKeyPair}
-		tlsConfig.NextProtos = []string{"http/1.1"}
 		tlsConfig.Rand = rand.Reader // Strictly not necessary, should be default
 	}
 
