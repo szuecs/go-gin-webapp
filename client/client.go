@@ -74,14 +74,14 @@ func (cli *Client) RenewAccessToken() {
 	client := &http.Client{}
 	req, err := http.NewRequest("GET", authURLStr, nil)
 	req.SetBasicAuth(username, password)
+
 	res, err := client.Do(req)
-	if res != nil {
-		defer res.Body.Close()
-	}
 	if err != nil {
 		fmt.Printf("ERR: Could not get Access Token, caused by: %s\n", err)
 		os.Exit(1)
 	}
+	defer res.Body.Close()
+
 	respBody, err := ioutil.ReadAll(res.Body)
 	if err != nil {
 		fmt.Printf("ERR: Can not read response body, caused by: %s\n", err)

@@ -16,10 +16,13 @@ config:
 	@test -e ~/.config/go-gin-webapp-cli/config.yaml || cp configcli.yaml.sample ~/.config/go-gin-webapp-cli/config.yaml
 	@echo "modify or delete ~/.config/go-gin-webapp-cli/config.yaml as you need"
 
-test.all: test.benchmark.new test.test test.vet
+test.all: test.benchmark.new test.test test.vet test.errcheck
 
 test.test:
 	GIN_MODE=release go test ./...
+
+test.errcheck:
+	errcheck ./...
 
 test.vet:
 	go vet -v ./...
