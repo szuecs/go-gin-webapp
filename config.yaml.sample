@@ -3,6 +3,6 @@ debugEnabled: false
 oauth2Enabled: false
 tlsCertfilePath: /path/to/your/certfile
 tlsKeyfilePath: /path/to/your/keyfile
-logFlushInterval: 5 #in seconds
+logFlushInterval: 5s
 port: 8080
 monitorPort: 9000
