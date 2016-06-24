@@ -53,13 +53,27 @@ func New() (*Config, error) {
 const PROJECTNAME string = "go-gin-webapp"
 
 // FIXME: not windows compatible
-func configInit(filename string) (*Config, error) {
-	b, err := ioutil.ReadFile(fmt.Sprintf("%s/.config/%s/config.yaml", os.ExpandEnv("$HOME"), PROJECTNAME))
+func readFile(filepath string) ([]byte, bool) {
+	b, err := ioutil.ReadFile(filepath)
 	if err != nil {
-		glog.Fatalf("Can not read config, caused by: %s", err)
+		return b, false
+	}
+	return b, true
+}
+
+// FIXME: not windows compatible
+func configInit(filename string) (*Config, error) {
+	globalConfig := fmt.Sprintf("/etc/%s/config.yaml", PROJECTNAME)
+	homeConfig := fmt.Sprintf("%s/.config/%s/config.yaml", os.ExpandEnv("$HOME"), PROJECTNAME)
+	b, ok := readFile(homeConfig)
+	if !ok {
+		b, ok = readFile(globalConfig)
+	}
+	if !ok {
+		return nil, fmt.Errorf("No file readable in %v nor in %v", globalConfig, homeConfig)
 	}
 	var config Config
-	err = yaml.Unmarshal(b, &config)
+	err := yaml.Unmarshal(b, &config)
 	if err != nil {
 		glog.Fatalf("configuration could not be unmarshaled, caused by: %s", err)
 	}
