@@ -1,6 +1,6 @@
 ---
 url:
-oauth2Enabled: false
-oauthURL:
-tokenURL:
+oauth2_enabled: false
+oauth_url:
+token_url:
 username:

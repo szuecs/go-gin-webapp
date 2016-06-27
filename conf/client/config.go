@@ -15,13 +15,13 @@ import (
 
 // ClientConfig is the configuration from the client. Usually loaded from config files.
 type ClientConfig struct {
-	URL           string   `yaml:"URL,omitempty"` //URL to our service endpoint set by the user
+	URL           string   `yaml:"url,omitempty"` //URL to our service endpoint set by the user
 	RealURL       *url.URL //RealURL to our service endpoint parsed from URL
-	Debug         bool     `yaml:"debugEnabled,omitempty"`  //true if Debug is enabled
-	Oauth2Enabled bool     `yaml:"oauth2Enabled,omitempty"` //true if oauth2 is enabled
-	OauthURL      string   `yaml:"URL,omitempty"`           //the oauth2 endpoint to be used
-	TokenURL      string   `yaml:"URL,omitempty"`           //the oauth2 token info endpoint
-	Username      string   `yaml:"URL,omitempty"`           //user to authenticate with, to get a token
+	Debug         bool     `yaml:"debug_enabled,omitempty"`  //true if Debug is enabled
+	Oauth2Enabled bool     `yaml:"oauth2_enabled,omitempty"` //true if oauth2 is enabled
+	OauthURL      string   `yaml:"oauth2_url,omitempty"`     //the oauth2 endpoint to be used
+	TokenURL      string   `yaml:"token_url,omitempty"`      //the oauth2 token info endpoint
+	Username      string   `yaml:"username,omitempty"`       //user to authenticate with, to get a token
 }
 
 //shared state for configuration
