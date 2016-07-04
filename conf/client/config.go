@@ -33,8 +33,7 @@ func New() *ClientConfig {
 		var err error
 		clientConf, err = clientConfigInit("config.yaml")
 		if err != nil {
-			fmt.Printf("could not load configuration. Reason: %s\n", err)
-			os.Exit(2)
+			glog.Exitf("could not load configuration. Reason: %s\n", err)
 		}
 	}
 
@@ -43,14 +42,15 @@ func New() *ClientConfig {
 
 //FIXME: ConfigPath and expansion of ENV vars like this is not windows compatible
 func clientConfigInit(filename string) (*ClientConfig, error) {
-	b, err := ioutil.ReadFile(fmt.Sprintf("%s/.config/go-gin-webapp-cli/config.yaml", os.ExpandEnv("$HOME")))
+	fpath := fmt.Sprintf("%s/.config/go-gin-webapp-cli/config.yaml", os.ExpandEnv("$HOME"))
+	b, err := ioutil.ReadFile(fpath)
 	if err != nil {
-		glog.Fatalf("Can not read config, caused by: %s", err)
+		glog.Exitf("can not read config from %s, caused by: %s", fpath, err)
 	}
 	var cfg ClientConfig
 	err = yaml.Unmarshal(b, &cfg)
 	if err != nil {
-		glog.Fatalf("configuration could not be unmarshaled, caused by: %s", err)
+		glog.Exitf("configuration could not be unmarshaled, caused by: %s", err)
 	}
 	return &cfg, err
 }

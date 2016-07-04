@@ -13,10 +13,10 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/golang/glog"
 	"github.com/szuecs/go-gin-webapp/conf"
-	"github.com/zalando-techmonkeys/gin-glog"
-	"github.com/zalando-techmonkeys/gin-gomonitor"
-	"github.com/zalando-techmonkeys/gin-oauth2"
-	"github.com/zalando-techmonkeys/gin-oauth2/zalando"
+	"github.com/zalando/gin-glog"
+	"github.com/zalando/gin-gomonitor"
+	"github.com/zalando/gin-oauth2"
+	"github.com/zalando/gin-oauth2/zalando"
 	"golang.org/x/oauth2"
 )
 
@@ -41,17 +41,6 @@ func (svc *Service) checkDependencies() bool {
 	return true
 }
 
-func (svc *Service) setAccessTuples(cfg *conf.Config) {
-	for _, t := range cfg.AuthorizedTeams {
-		tp := zalando.AccessTuple{
-			Realm: t.Realm,
-			Uid:   t.UID,
-			Cn:    t.Cn}
-		zalando.AccessTuples = append(zalando.AccessTuples, tp)
-	}
-
-}
-
 // Run is the main function of the server. It bootstraps the service
 // and creates the route endpoints.
 func (svc *Service) Run(config *ServiceConfig) error {
@@ -72,21 +61,15 @@ func (svc *Service) Run(config *ServiceConfig) error {
 	// OAuth2 secured if conf.Oauth2Enabled is set
 	var private *gin.RouterGroup
 	if cfg.Oauth2Enabled {
-		zalando.AccessTuples = []zalando.AccessTuple{}
 		private = router.Group("")
 
 		if cfg.AuthorizedTeams != nil {
-			glog.Infof("OAuth2 team authorization, grant to: %s", cfg.AuthorizedTeams)
-			svc.setAccessTuples(cfg)
-			private.Use(ginoauth2.Auth(zalando.GroupCheck, config.OAuth2Endpoints))
-
-		} else if cfg.AuthorizedUsers != nil {
-			glog.Infof("OAuth2 user authorization, grant to: %s", cfg.AuthorizedUsers)
-			svc.setAccessTuples(cfg)
-			private.Use(ginoauth2.Auth(zalando.UidCheck, config.OAuth2Endpoints))
-
-		} else {
-			glog.Fatal("You want to start with OAuth2, but have no valid configuration to build access tuples.")
+			glog.Infof("OAuth2 team authorization, grant to: %+v", cfg.AuthorizedTeams)
+			private.Use(ginoauth2.Auth(zalando.GroupCheck(cfg.AuthorizedTeams), config.OAuth2Endpoints))
+		}
+		if cfg.AuthorizedUsers != nil {
+			glog.Infof("OAuth2 user authorization, grant to: %+v", cfg.AuthorizedUsers)
+			private.Use(ginoauth2.Auth(zalando.UidCheck(cfg.AuthorizedUsers), config.OAuth2Endpoints))
 		}
 	}
 
@@ -128,17 +111,17 @@ func (svc *Service) Run(config *ServiceConfig) error {
 	if config.Httponly {
 		err := serve.ListenAndServe()
 		if err != nil {
-			glog.Fatalf("Can not Serve HTTP, caused by: %s\n", err)
+			glog.Exitf("Can not Serve HTTP, caused by: %s", err)
 		}
 	} else {
 		conn, err := net.Listen("tcp", serve.Addr)
 		if err != nil {
-			panic(err)
+			glog.Exitf("Can not listen on %s, because some other process is already using it", serve.Addr)
 		}
 		tlsListener := tls.NewListener(conn, &tlsConfig)
 		err = serve.Serve(tlsListener)
 		if err != nil {
-			glog.Fatalf("Can not Serve TLS, caused by: %s\n", err)
+			glog.Exitf("Can not Serve TLS, caused by: %s", err)
 		}
 	}
 	return nil

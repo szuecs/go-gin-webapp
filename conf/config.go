@@ -11,30 +11,24 @@ import (
 	"gopkg.in/yaml.v1"
 
 	"github.com/golang/glog"
+	"github.com/zalando/gin-oauth2/zalando"
 )
 
 // Config is the configuration struct. The config file config.yaml
 // will unmarshaled to this struct.
 type Config struct {
-	DebugEnabled     bool          `yaml:"debug_enabled,omitempty"`
-	Oauth2Enabled    bool          `yaml:"oauth2_enabled,omitempty"`
-	ProfilingEnabled bool          `yaml:"profiling_enabled,omitempty"`
-	Port             int           `yaml:"port,omitempty"`
-	MonitorPort      int           `yaml:"monitor_port,omitempty"`
-	LogFlushInterval time.Duration `yaml:"log_flush_interval,omitempty"`
-	TLSCertfilePath  string        `yaml:"tls_certfile_path,omitempty"`
-	TLSKeyfilePath   string        `yaml:"tls_keyfile_path,omitempty"`
-	AuthURL          string        `yaml:"auth_url,omitempty"`
-	TokenURL         string        `yaml:"token_url,omitempty"`
-	AuthorizedTeams  []AccessTuple `yaml:"authorized_teams,omitempty"`
-	AuthorizedUsers  []AccessTuple `yaml:"authorized_users,omitempty"`
-}
-
-// AccessTuple represents an entry for Authorization
-type AccessTuple struct {
-	Realm string `yaml:"realm,omitempty"`
-	UID   string `yaml:"uid,omitempty"`
-	Cn    string `yaml:"cn,omitempty"`
+	DebugEnabled     bool                  `yaml:"debug_enabled,omitempty"`
+	Oauth2Enabled    bool                  `yaml:"oauth2_enabled,omitempty"`
+	ProfilingEnabled bool                  `yaml:"profiling_enabled,omitempty"`
+	Port             int                   `yaml:"port,omitempty"`
+	MonitorPort      int                   `yaml:"monitor_port,omitempty"`
+	LogFlushInterval time.Duration         `yaml:"log_flush_interval,omitempty"`
+	TLSCertfilePath  string                `yaml:"tls_certfile_path,omitempty"`
+	TLSKeyfilePath   string                `yaml:"tls_keyfile_path,omitempty"`
+	AuthURL          string                `yaml:"auth_url,omitempty"`
+	TokenURL         string                `yaml:"token_url,omitempty"`
+	AuthorizedTeams  []zalando.AccessTuple `yaml:"authorized_teams,omitempty"`
+	AuthorizedUsers  []zalando.AccessTuple `yaml:"authorized_users,omitempty"`
 }
 
 // shared state for configuration
