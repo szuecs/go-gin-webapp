@@ -1,6 +1,6 @@
 default: test.test
 
-all: godep.restore clean build.linux build.osx build.win
+all: clean build.linux build.osx build.win
 
 clean:
 	rm -rf build
@@ -49,17 +49,6 @@ test.profile.cpu: build.local
 check.dependencies:
 	go-ls -ignore=/vendor/ -exec="depscheck -v" ./...
 
-# requires: % go get github.com/tools/godep
-godep.clean:
-	rm -rf Godeps
-
-godep.restore:
-	git checkout Godeps
-	godep restore
-
-godep.recreate: godep.clean
-	godep save
-
 prepare:
 	@mkdir -p build/linux
 	@mkdir -p build/osx
@@ -68,26 +57,26 @@ prepare:
 
 # release
 build.linux.release: prepare
-	GOOS=linux GOARCH=amd64 CGO_ENABLED=0 godep go build -o build/linux/go-gin-webapp -ldflags "-X main.Buildstamp=`date -u '+%Y-%m-%d_%I:%M:%S%p'` -X main.Githash=`git rev-parse HEAD` -X main.Version=`git describe --tags`" -tags zalandoValidation ./cmd/go-gin-webapp
-	GOOS=linux GOARCH=amd64 CGO_ENABLED=0 godep go build -o build/linux/go-gin-webapp-cli -ldflags "-X main.Buildstamp=`date -u '+%Y-%m-%d_%I:%M:%S%p'` -X main.Githash=`git rev-parse HEAD` -X main.Version=`git describe --tags`" -tags zalandoValidation ./cmd/go-gin-webapp-cli
+	GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o build/linux/go-gin-webapp -ldflags "-X main.Buildstamp=`date -u '+%Y-%m-%d_%I:%M:%S%p'` -X main.Githash=`git rev-parse HEAD` -X main.Version=`git describe --tags`" -tags zalandoValidation ./cmd/go-gin-webapp
+	GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o build/linux/go-gin-webapp-cli -ldflags "-X main.Buildstamp=`date -u '+%Y-%m-%d_%I:%M:%S%p'` -X main.Githash=`git rev-parse HEAD` -X main.Version=`git describe --tags`" -tags zalandoValidation ./cmd/go-gin-webapp-cli
 
 # dev builds
 build.client.local: prepare
-	godep go build -o build/go-gin-webapp-cli -ldflags "-X main.Buildstamp=`date -u '+%Y-%m-%d_%I:%M:%S%p'` -X main.Githash=`git rev-parse HEAD` -X main.Version=HEAD" -tags zalandoValidation  ./cmd/go-gin-webapp-cli
+	go build -o build/go-gin-webapp-cli -ldflags "-X main.Buildstamp=`date -u '+%Y-%m-%d_%I:%M:%S%p'` -X main.Githash=`git rev-parse HEAD` -X main.Version=HEAD" -tags zalandoValidation  ./cmd/go-gin-webapp-cli
 
 build.service.local: prepare
-	godep go build -o build/go-gin-webapp -ldflags "-X main.Buildstamp=`date -u '+%Y-%m-%d_%I:%M:%S%p'` -X main.Githash=`git rev-parse HEAD` -X main.Version=HEAD" -tags zalandoValidation  ./cmd/go-gin-webapp
+	go build -o build/go-gin-webapp -ldflags "-X main.Buildstamp=`date -u '+%Y-%m-%d_%I:%M:%S%p'` -X main.Githash=`git rev-parse HEAD` -X main.Version=HEAD" -tags zalandoValidation  ./cmd/go-gin-webapp
 
 # OS specific builds
 build.linux: prepare
-	GOOS=linux GOARCH=amd64 CGO_ENABLED=0 godep go build -o build/linux/go-gin-webapp -ldflags "-X main.Buildstamp=`date -u '+%Y-%m-%d_%I:%M:%S%p'` -X main.Githash=`git rev-parse HEAD` -X main.Version=HEAD" -tags zalandoValidation ./cmd/go-gin-webapp
+	GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o build/linux/go-gin-webapp -ldflags "-X main.Buildstamp=`date -u '+%Y-%m-%d_%I:%M:%S%p'` -X main.Githash=`git rev-parse HEAD` -X main.Version=HEAD" -tags zalandoValidation ./cmd/go-gin-webapp
 
 build.osx: prepare
-	GOOS=darwin GOARCH=amd64 CGO_ENABLED=0 godep go build -o build/osx/go-gin-webapp -ldflags "-X main.Buildstamp=`date -u '+%Y-%m-%d_%I:%M:%S%p'` -X main.Githash=`git rev-parse HEAD` -X main.Version=HEAD" -tags zalandoValidation ./cmd/go-gin-webapp
+	GOOS=darwin GOARCH=amd64 CGO_ENABLED=0 go build -o build/osx/go-gin-webapp -ldflags "-X main.Buildstamp=`date -u '+%Y-%m-%d_%I:%M:%S%p'` -X main.Githash=`git rev-parse HEAD` -X main.Version=HEAD" -tags zalandoValidation ./cmd/go-gin-webapp
 
 build.win: prepare
-	GOOS=windows GOARCH=amd64 CGO_ENABLED=0 godep go build -o build/windows/go-gin-webapp -ldflags "-X main.Buildstamp=`date -u '+%Y-%m-%d_%I:%M:%S%p'` -X main.Githash=`git rev-parse HEAD` -X main.Version=HEAD" -tags zalandoValidation ./cmd/go-gin-webapp
+	GOOS=windows GOARCH=amd64 CGO_ENABLED=0 go build -o build/windows/go-gin-webapp -ldflags "-X main.Buildstamp=`date -u '+%Y-%m-%d_%I:%M:%S%p'` -X main.Githash=`git rev-parse HEAD` -X main.Version=HEAD" -tags zalandoValidation ./cmd/go-gin-webapp
 
 # build and install multi binary project
 dev.install:
-	godep go install -ldflags "-X main.Buildstamp=`date -u '+%Y-%m-%d_%I:%M:%S%p'` -X main.Githash=`git rev-parse HEAD` -X main.Version=HEAD" -tags zalandoValidation ./...
+	go install -ldflags "-X main.Buildstamp=`date -u '+%Y-%m-%d_%I:%M:%S%p'` -X main.Githash=`git rev-parse HEAD` -X main.Version=HEAD" -tags zalandoValidation ./...
