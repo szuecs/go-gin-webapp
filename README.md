@@ -48,3 +48,14 @@ The client package implements a client, that calls your api endpoints.
 Configuring your service and client, use the following make target:
 
     % make config
+
+Create a docker container from your current git tagged release, it
+will automatically create scm-source.json for you and you git tools to
+get the tagged version from your local tree:
+
+    % make build.docker
+    % make build.push    # if you want to build and push
+
+Create a rkt container from your current git tagged release:
+
+    % make build.rkt
