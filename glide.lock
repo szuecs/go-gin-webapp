@@ -1,0 +1,70 @@
+hash: 6b4b021b1fae7047abab2932f947c4ee44f023b8708f904541d1d8a1d67bc9eb
+updated: 2016-09-15T15:49:17.870194228+02:00
+imports:
+- name: github.com/alecthomas/template
+  version: a0175ee3bccc567396460bf5acd36800cb10c49c
+  subpackages:
+  - parse
+- name: github.com/alecthomas/units
+  version: 2efee857e7cfd4f3d0138cc3cbb1b4966962b93a
+- name: github.com/DeanThompson/ginpprof
+  version: 0bc18f7fddb0f011fc24d13dfe5b6d9ebb1de655
+- name: github.com/gin-gonic/gin
+  version: 5caaac4c5c712a9e7a7de29e6c24ef46c753017f
+  subpackages:
+  - binding
+  - render
+- name: github.com/golang/glog
+  version: 23def4e6c14b4da8ac2ed8007337bc5eb5007998
+- name: github.com/golang/protobuf
+  version: 2402d76f3d41f928c7902a765dfc872356dd3aad
+  subpackages:
+  - proto
+- name: github.com/manucorporat/sse
+  version: ee05b128a739a0fb76c7ebd3ae4810c1de808d6d
+- name: github.com/zalando/gin-glog
+  version: 889447754c9341143a101ccc6449d91d0b9ba57a
+- name: github.com/zalando/gin-gomonitor
+  version: 82a5304184fa0553512dc9ef3365a9afa340fb74
+- name: github.com/zalando/gin-oauth2
+  version: 1359a47129b3f886e3b50cd7a645a97d15765727
+  subpackages:
+  - zalando
+- name: golang.org/x/crypto
+  version: 81372b2fc2f10bef2a7f338da115c315a56b2726
+  subpackages:
+  - ssh/terminal
+- name: golang.org/x/net
+  version: f315505cf3349909cdf013ea56690da34e96a451
+  subpackages:
+  - context
+  - publicsuffix
+- name: golang.org/x/oauth2
+  version: 3c3a985cb79f52a3190fbc056984415ca6763d01
+  subpackages:
+  - internal
+- name: google.golang.org/appengine
+  version: 78199dcb0669fc381c22e919e1e97eba879e8f60
+  subpackages:
+  - internal
+  - internal/base
+  - internal/datastore
+  - internal/log
+  - internal/remote_api
+  - internal/urlfetch
+  - urlfetch
+- name: gopkg.in/alecthomas/kingpin.v2
+  version: e9044be3ab2a8e11d4e1f418d12f0790d57e8d70
+- name: gopkg.in/go-playground/validator.v8
+  version: c193cecd124b5cc722d7ee5538e945bdb3348435
+- name: gopkg.in/mcuadros/go-monitor.v1
+  version: b46e0cb50c9d4bd193bc1ebed8119f1f0b9a0aff
+  subpackages:
+  - aspects
+- name: gopkg.in/resty.v0
+  version: 0eed47a8f8c2575a34a067585dc0853d91943ac4
+- name: gopkg.in/yaml.v1
+  version: 9f9df34309c04878acc86042b16630b0f696e1de
+- name: gopkg.in/yaml.v2
+  version: 31c299268d302dd0aa9a0dcf765a3d58971ac83f
+testImports: []
