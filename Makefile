@@ -1,6 +1,25 @@
-default: test.test
+.PHONY: clean clean check build.docker scm-source
 
-all: clean build.linux build.osx build.win
+BINARY_BASE   ?= go-gin-webapp
+TEAM          ?= teapot
+REGISTRY      ?= pierone.stups.zalan.do
+IMAGE_NAME    ?= $(BINARY_BASE)
+VERSION       ?= $(shell git describe --tags --always --dirty)
+GIT_NAME      ?= $(shell git config --global --get user.name)
+GIT_EMAIL     ?= $(shell git config --global --get user.email)
+IMAGE         ?= $(REGISTRY)/$(TEAM)/$(IMAGE_NAME)
+TAG           ?= $(VERSION)
+TARGET_GOOS   ?= linux
+TARGET_GOARCH ?= amd64
+DOCKERFILE    ?= Dockerfile
+GITHEAD       = $(shell git rev-parse --short HEAD)
+GITURL        = $(shell git config --get remote.origin.url)
+GITSTATUS     = $(shell git status --porcelain || echo "no changes")
+SOURCES       = $(shell find . -name '*.go')
+BUILD_FLAGS   ?= -v
+LDFLAGS       ?= -X main.Version=$(VERSION) -X main.Buildstamp=$(shell date -u '+%Y-%m-%d_%I:%M:%S%p') -X main.Githash=$(shell git rev-parse HEAD)
+
+default: build.local
 
 clean:
 	rm -rf build
@@ -9,74 +28,50 @@ clean:
 	find . -name '*.test' -delete
 
 config:
-	@test -d ~/.config/go-gin-webapp || mkdir -p ~/.config/go-gin-webapp
-	@test -e ~/.config/go-gin-webapp/config.yaml || cp config.yaml.sample ~/.config/go-gin-webapp/config.yaml
-	@echo "modify ~/.config/go-gin-webapp/config.yaml as you need"
-	@test -d ~/.config/go-gin-webapp-cli || mkdir -p ~/.config/go-gin-webapp-cli
-	@test -e ~/.config/go-gin-webapp-cli/config.yaml || cp configcli.yaml.sample ~/.config/go-gin-webapp-cli/config.yaml
-	@echo "modify or delete ~/.config/go-gin-webapp-cli/config.yaml as you need"
+	@test -d ~/.config/$(BINARY_BASE) || mkdir -p ~/.config/$(BINARY_BASE)
+	@test -e ~/.config/$(BINARY_BASE)/config.yaml || cp config.yaml.sample ~/.config/$(BINARY_BASE)/
+	@echo "modify ~/.config/$(BINARY_BASE)/config.yaml as you need"
 
-test.all: test.benchmark.new test.test test.vet test.errcheck
+check:
+	golint ./... | egrep -v '^vendor/'
+	go vet -v ./... 2>&1 | egrep -v '^(vendor/|exit status 1)'
 
-test.test:
-	GIN_MODE=release go test ./...
+build.local: build/$(BINARY_BASE)
+build.linux: build/linux/$(BINARY_BASE)
+build.osx: build/osx/$(BINARY_BASE)
 
-test.errcheck:
-	errcheck ./...
+build/$(BINARY_BASE): $(SOURCES)
+	go build -o build/"$(BINARY_BASE)" "$(BUILD_FLAGS)" -ldflags "$(LDFLAGS)" -tags zalandoValidation ./cmd/$(BINARY_BASE)
 
-test.vet:
-	go vet -v ./...
+build/linux/$(BINARY_BASE): $(SOURCES)
+	GOOS=linux GOARCH=$(TARGET_GOARCH) CGO_ENABLED=0 go build "$(BUILD_FLAGS)" -o build/linux/"$(BINARY_BASE)" -ldflags "$(LDFLAGS)" -tags zalandoValidation ./cmd/$(BINARY_BASE)
 
-test.benchmark.new:
-	go list ./... |  xargs go test -run=^$$ -bench=. | tee test/bench.new
+build/osx/$(BINARY_BASE): $(SOURCES)
+	GOOS=darwin GOARCH=$(TARGET_GOARCH) CGO_ENABLED=0 go build "$(BUILD_FLAGS)" -o build/osx/"$(BINARY_BASE)" -ldflags "$(LDFLAGS)" -tags zalandoValidation ./cmd/$(BINARY_BASE)
 
-test.benchmark.old:
-	go list ./... |  xargs go test -run=^$$ -bench=. | tee test/bench.old
+$(DOCKERFILE).upstream: $(DOCKERFILE)
+	sed "s@UPSTREAM@$(shell $(shell head -1 $(DOCKERFILE) | sed -E 's@FROM (.*)/(.*)/(.*):.*@pierone tags \2 \3 --url \1@') | awk '{print $$3}' | tail -1)@" $(DOCKERFILE) > $(DOCKERFILE).upstream
 
-test.benchmark.cmp:
-	benchcmp test/bench.old test/bench.new
+build.docker: $(DOCKERFILE).upstream scm-source.json build.linux
+	docker build --rm -t "$(IMAGE):$(TAG)" -f $(DOCKERFILE).upstream .
 
-## profiling parameters can be overridden: % make test.profile.cpu N=5 P=/health
-# 30s is the default value to profile your web application
-N?=30
-# / is the default for request path to the web application you want to profile
-P?=/
-# requires: % go get github.com/DeanThompson/ginpprof
-test.profile.cpu: build.local
-	scripts/pprof $(N) $(P)
+build.push: build.docker
+	docker push "$(IMAGE):$(TAG)"
 
-# requires: % go get github.com/laher/gols/...
-check.dependencies:
-	go-ls -ignore=/vendor/ -exec="depscheck -v" ./...
+scm-source.json: .git
+	scm-source
 
-prepare:
-	@mkdir -p build/linux
-	@mkdir -p build/osx
-	@mkdir -p build/windows
-	@echo created ./build/ directories
-
-# release
-build.linux.release: prepare
-	GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o build/linux/go-gin-webapp -ldflags "-X main.Buildstamp=`date -u '+%Y-%m-%d_%I:%M:%S%p'` -X main.Githash=`git rev-parse HEAD` -X main.Version=`git describe --tags`" -tags zalandoValidation ./cmd/go-gin-webapp
-	GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o build/linux/go-gin-webapp-cli -ldflags "-X main.Buildstamp=`date -u '+%Y-%m-%d_%I:%M:%S%p'` -X main.Githash=`git rev-parse HEAD` -X main.Version=`git describe --tags`" -tags zalandoValidation ./cmd/go-gin-webapp-cli
-
-# dev builds
-build.client.local: prepare
-	go build -o build/go-gin-webapp-cli -ldflags "-X main.Buildstamp=`date -u '+%Y-%m-%d_%I:%M:%S%p'` -X main.Githash=`git rev-parse HEAD` -X main.Version=HEAD" -tags zalandoValidation  ./cmd/go-gin-webapp-cli
-
-build.service.local: prepare
-	go build -o build/go-gin-webapp -ldflags "-X main.Buildstamp=`date -u '+%Y-%m-%d_%I:%M:%S%p'` -X main.Githash=`git rev-parse HEAD` -X main.Version=HEAD" -tags zalandoValidation  ./cmd/go-gin-webapp
-
-# OS specific builds
-build.linux: prepare
-	GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o build/linux/go-gin-webapp -ldflags "-X main.Buildstamp=`date -u '+%Y-%m-%d_%I:%M:%S%p'` -X main.Githash=`git rev-parse HEAD` -X main.Version=HEAD" -tags zalandoValidation ./cmd/go-gin-webapp
-
-build.osx: prepare
-	GOOS=darwin GOARCH=amd64 CGO_ENABLED=0 go build -o build/osx/go-gin-webapp -ldflags "-X main.Buildstamp=`date -u '+%Y-%m-%d_%I:%M:%S%p'` -X main.Githash=`git rev-parse HEAD` -X main.Version=HEAD" -tags zalandoValidation ./cmd/go-gin-webapp
-
-build.win: prepare
-	GOOS=windows GOARCH=amd64 CGO_ENABLED=0 go build -o build/windows/go-gin-webapp -ldflags "-X main.Buildstamp=`date -u '+%Y-%m-%d_%I:%M:%S%p'` -X main.Githash=`git rev-parse HEAD` -X main.Version=HEAD" -tags zalandoValidation ./cmd/go-gin-webapp
-
-# build and install multi binary project
-dev.install:
-	go install -ldflags "-X main.Buildstamp=`date -u '+%Y-%m-%d_%I:%M:%S%p'` -X main.Githash=`git rev-parse HEAD` -X main.Version=HEAD" -tags zalandoValidation ./...
+build.rkt: scm-source.json build.linux
+	acbuild begin
+	acbuild set-name $(TEAM)/$(BINARY_BASE)
+	acbuild copy build/linux/$(BINARY_BASE) /$(BINARY_BASE)
+	acbuild copy config.yaml.sample /root/.config/$(BINARY_BASE)/config.yaml
+	acbuild copy scm-source.json /scm-source.json
+	acbuild set-exec -- /$(BINARY_BASE) --logtostderr -debug -v=2
+	acbuild port add 8080 tcp 8080
+	acbuild label add version $(VERSION)
+	acbuild label add arch $(TARGET_GOARCH)
+	acbuild label add os $(TARGET_GOOS)
+	acbuild annotation add authors "$(GIT_NAME) <$(GIT_EMAIL)>"
+	acbuild write $(BINARY_BASE)-$(VERSION).$(TARGET_GOOS)-$(TARGET_GOARCH).aci
+	acbuild end
