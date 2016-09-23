@@ -29,7 +29,7 @@ clean:
 
 config:
 	@test -d ~/.config/$(BINARY_BASE) || mkdir -p ~/.config/$(BINARY_BASE)
-	@test -e ~/.config/$(BINARY_BASE)/config.yaml || cp config.yaml.sample ~/.config/$(BINARY_BASE)/
+	@test -e ~/.config/$(BINARY_BASE)/config.yaml || cp config.yaml.sample ~/.config/$(BINARY_BASE)/config.yaml
 	@echo "modify ~/.config/$(BINARY_BASE)/config.yaml as you need"
 
 check:
