@@ -2,7 +2,7 @@
 
 BINARY_BASE   ?= go-gin-webapp
 TEAM          ?= teapot
-REGISTRY      ?= pierone.stups.zalan.do
+REGISTRY      ?= registry.opensource.zalan.do
 IMAGE_NAME    ?= $(BINARY_BASE)
 VERSION       ?= $(shell git describe --tags --always --dirty)
 GIT_NAME      ?= $(shell git config --global --get user.name)
