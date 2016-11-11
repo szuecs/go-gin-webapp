@@ -24,14 +24,17 @@ authentication and authorization.
 To create a new web application, you can do the following steps
 
     APP=<appname>
-    DST=$GOPATH/src/<repo-hoster>/<user>/$APP
+    REPO_USER=<repo-hoster>/<user>
+    DST=$GOPATH/src/$REPO_USER/$APP
     mkdir -p $DST
     go get -u github.com/szuecs/go-gin-webapp
     rsync -a --exclude=.git $GOPATH/src/github.com/szuecs/go-gin-webapp/ $DST
     cd $DST
+    grep -rl github.com/szuecs/go-gin-webapp * | xargs sed -i "s@github.com/szuecs/go-gin-webapp@$REPO_USER/$APP@"
     grep -rl go-gin-webapp | xargs sed -i "s@go-gin-webapp@$APP@g"
     mv cmd/go-gin-webapp cmd/$APP
     mv cmd/go-gin-webapp-cli cmd/${APP}-cli
+    echo "# $APP" > README.md
 
 
 The main package and function of the service is in
