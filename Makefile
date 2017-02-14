@@ -1,4 +1,4 @@
-.PHONY: clean clean check build.docker scm-source
+.PHONY: clean clean check build.docker scm-source test
 
 BINARY_BASE   ?= go-gin-webapp
 TEAM          ?= teapot
@@ -32,9 +32,12 @@ config:
 	@test -e ~/.config/$(BINARY_BASE)/config.yaml || cp config.yaml.sample ~/.config/$(BINARY_BASE)/config.yaml
 	@echo "modify ~/.config/$(BINARY_BASE)/config.yaml as you need"
 
+test:
+	go test $(shell glide novendor)
+
 check:
-	golint ./... | egrep -v '^vendor/'
-	go vet -v ./... 2>&1 | egrep -v '^(vendor/|exit status 1)'
+	golint $(shell glide novendor)
+	go vet -v $(shell glide novendor)
 
 build.local: build/$(BINARY_BASE)
 build.linux: build/linux/$(BINARY_BASE)
