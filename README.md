@@ -35,7 +35,10 @@ To create a new web application, you can do the following steps
     mv cmd/go-gin-webapp cmd/$APP
     mv cmd/go-gin-webapp-cli cmd/${APP}-cli
     echo "# $APP" > README.md
-
+    git add .
+    git commit -m "init $APP"
+    go get -u github.com/Masterminds/glide/... 
+    glide i
 
 The main package and function of the service is in
 cmd/$APP/server.go. It parses flags and merges the configuration to
