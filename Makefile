@@ -2,7 +2,7 @@
 
 APP           ?= appname
 REPO_USER     ?= repo/user
-DST = $(GOPATH)/src/$(REPO_USER)/$(APP)
+SED           ?= sed
 
 BINARY_BASE   ?= go-gin-webapp
 TEAM          ?= teapot
@@ -16,12 +16,13 @@ TAG           ?= $(VERSION)
 TARGET_GOOS   ?= linux
 TARGET_GOARCH ?= amd64
 DOCKERFILE    ?= Dockerfile
-GITHEAD       = $(shell git rev-parse --short HEAD)
-GITURL        = $(shell git config --get remote.origin.url)
-GITSTATUS     = $(shell git status --porcelain || echo "no changes")
-SOURCES       = $(shell find . -name '*.go')
 BUILD_FLAGS   ?= -v
 LDFLAGS       ?= -X main.Version=$(VERSION) -X main.Buildstamp=$(shell date -u '+%Y-%m-%d_%I:%M:%S%p') -X main.Githash=$(shell git rev-parse HEAD)
+GITHEAD   = $(shell git rev-parse --short HEAD)
+GITURL    = $(shell git config --get remote.origin.url)
+GITSTATUS = $(shell git status --porcelain || echo "no changes")
+SOURCES   = $(shell find . -name '*.go')
+DST       = $(GOPATH)/src/$(REPO_USER)/$(APP)
 
 default: build.local
 
@@ -57,7 +58,7 @@ build/osx/$(BINARY_BASE): $(SOURCES)
 	GOOS=darwin GOARCH=$(TARGET_GOARCH) CGO_ENABLED=0 go build "$(BUILD_FLAGS)" -o build/osx/"$(BINARY_BASE)" -ldflags "$(LDFLAGS)" -tags zalandoValidation ./cmd/$(BINARY_BASE)
 
 $(DOCKERFILE).upstream: $(DOCKERFILE)
-	sed "s@UPSTREAM@$(shell $(shell head -1 $(DOCKERFILE) | sed -E 's@FROM (.*)/(.*)/(.*):.*@pierone tags \2 \3 --url \1@') | awk '{print $$3}' | tail -1)@" $(DOCKERFILE) > $(DOCKERFILE).upstream
+	$(SED) "s@UPSTREAM@$(shell $(shell head -1 $(DOCKERFILE) | $(SED) -E 's@FROM (.*)/(.*)/(.*):.*@pierone tags \2 \3 --url \1@') | awk '{print $$3}' | tail -1)@" $(DOCKERFILE) > $(DOCKERFILE).upstream
 
 build.docker: $(DOCKERFILE).upstream scm-source.json build.linux
 	docker build --rm -t "$(IMAGE):$(TAG)" -f $(DOCKERFILE).upstream .
@@ -87,11 +88,10 @@ create.app: create.$(APP)
 
 create.$(APP):
 	mkdir -p $(DST)
-	go get -u github.com/szuecs/go-gin-webapp/...
 	rsync -a --exclude=.git $(GOPATH)/src/github.com/szuecs/go-gin-webapp/ $(DST)
 	cd $(DST)
-	grep -rl github.com/szuecs/go-gin-webapp * | xargs sed -i "s@github.com/szuecs/go-gin-webapp@$(REPO_USER)/$(APP)@"
-	grep -rl go-gin-webapp | xargs sed -i "s@go-gin-webapp@$(APP)@g"
+	grep -rl github.com/szuecs/go-gin-webapp * | xargs $(SED) -i "s@github.com/szuecs/go-gin-webapp@$(REPO_USER)/$(APP)@"
+	grep -rl go-gin-webapp | xargs $(SED) -i "s@go-gin-webapp@$(APP)@g"
 	mv cmd/go-gin-webapp cmd/$(APP)
 	mv cmd/go-gin-webapp-cli cmd/$(APP)-cli
 	echo "# $(APP)" > README.md
