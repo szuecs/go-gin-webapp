@@ -89,14 +89,14 @@ create.app: create.$(APP)
 create.$(APP):
 	mkdir -p $(DST)
 	rsync -a --exclude=.git $(GOPATH)/src/github.com/szuecs/go-gin-webapp/ $(DST)
-	cd $(DST)
-	grep -rl github.com/szuecs/go-gin-webapp * | xargs $(SED) -i "s@github.com/szuecs/go-gin-webapp@$(REPO_USER)/$(APP)@"
-	grep -rl go-gin-webapp * | xargs $(SED) -i "s@go-gin-webapp@$(APP)@g"
-	mv cmd/go-gin-webapp cmd/$(APP)
-	mv cmd/go-gin-webapp-cli cmd/$(APP)-cli
-	echo "# $(APP)" > README.md
-	git add .
-	git commit -m "init $(APP)"
+	grep -rl github.com/szuecs/go-gin-webapp $(DST) | xargs $(SED) -i "s@github.com/szuecs/go-gin-webapp@$(REPO_USER)/$(APP)@"
+	grep -rl go-gin-webapp $(DST) | xargs $(SED) -i "s@go-gin-webapp@$(APP)@g"
+	mv $(DST)/cmd/go-gin-webapp $(DST)/cmd/$(APP)
+	mv $(DST)/cmd/go-gin-webapp-cli $(DST)/cmd/$(APP)-cli
+	echo "# $(APP)" > $(DST)/README.md
+	cd $(DST); git init
+	cd $(DST); git add .
+	cd $(DST); git ci -m "init $(APP)"
 	go get -u github.com/Masterminds/glide/...
-	glide i
+	cd $(DST); glide i
 
