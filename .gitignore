@@ -1,5 +1,5 @@
 vendor
-.glide.lock
+glide.lock
 Dockerfile.upstream
 scm-source.json
 *.aci
