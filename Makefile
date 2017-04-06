@@ -1,5 +1,9 @@
 .PHONY: clean clean check build.docker scm-source test
 
+APP           ?= appname
+REPO_USER     ?= repo/user
+DST = $(GOPATH)/src/$(REPO_USER)/$(APP)
+
 BINARY_BASE   ?= go-gin-webapp
 TEAM          ?= teapot
 REGISTRY      ?= registry.opensource.zalan.do
@@ -78,3 +82,19 @@ build.rkt: scm-source.json build.linux
 	acbuild annotation add authors "$(GIT_NAME) <$(GIT_EMAIL)>"
 	acbuild write $(BINARY_BASE)-$(VERSION).$(TARGET_GOOS)-$(TARGET_GOARCH).aci
 	acbuild end
+
+create.$(APP):
+	mkdir -p $(DST)
+	go get -u github.com/szuecs/go-gin-webapp
+	rsync -a --exclude=.git $(GOPATH)/src/github.com/szuecs/go-gin-webapp/ $(DST)
+	cd $(DST)
+	grep -rl github.com/szuecs/go-gin-webapp * | xargs sed -i "s@github.com/szuecs/go-gin-webapp@$(REPO_USER)/$(APP)@"
+	grep -rl go-gin-webapp | xargs sed -i "s@go-gin-webapp@$(APP)@g"
+	mv cmd/go-gin-webapp cmd/$(APP)
+	mv cmd/go-gin-webapp-cli cmd/$(APP)-cli
+	echo "# $(APP)" > README.md
+	git add .
+	git commit -m "init $(APP)"
+	go get -u github.com/Masterminds/glide/...
+	glide i
+
