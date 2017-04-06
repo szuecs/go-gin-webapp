@@ -54,9 +54,10 @@ func (svc *Service) Run(config *ServiceConfig) error {
 	// Middleware
 	router := gin.New()
 	router.Use(ginglog.Logger(cfg.LogFlushInterval))
-	// pass your custom aspects here to get them available
-	router.Use(gomonitor.Metrics(cfg.MonitorPort, []aspects.Aspect{}))
 	router.Use(gin.Recovery())
+
+	// pass your custom aspects here to get them available
+	gomonitor.Metrics(cfg.MonitorPort, []aspects.Aspect{})
 
 	// OAuth2 secured if conf.Oauth2Enabled is set
 	var private *gin.RouterGroup
