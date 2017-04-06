@@ -91,7 +91,7 @@ create.$(APP):
 	rsync -a --exclude=.git $(GOPATH)/src/github.com/szuecs/go-gin-webapp/ $(DST)
 	cd $(DST)
 	grep -rl github.com/szuecs/go-gin-webapp * | xargs $(SED) -i "s@github.com/szuecs/go-gin-webapp@$(REPO_USER)/$(APP)@"
-	grep -rl go-gin-webapp | xargs $(SED) -i "s@go-gin-webapp@$(APP)@g"
+	grep -rl go-gin-webapp * | xargs $(SED) -i "s@go-gin-webapp@$(APP)@g"
 	mv cmd/go-gin-webapp cmd/$(APP)
 	mv cmd/go-gin-webapp-cli cmd/$(APP)-cli
 	echo "# $(APP)" > README.md
