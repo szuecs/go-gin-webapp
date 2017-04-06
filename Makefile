@@ -83,9 +83,11 @@ build.rkt: scm-source.json build.linux
 	acbuild write $(BINARY_BASE)-$(VERSION).$(TARGET_GOOS)-$(TARGET_GOARCH).aci
 	acbuild end
 
+create.app: create.$(APP)
+
 create.$(APP):
 	mkdir -p $(DST)
-	go get -u github.com/szuecs/go-gin-webapp
+	go get -u github.com/szuecs/go-gin-webapp/...
 	rsync -a --exclude=.git $(GOPATH)/src/github.com/szuecs/go-gin-webapp/ $(DST)
 	cd $(DST)
 	grep -rl github.com/szuecs/go-gin-webapp * | xargs sed -i "s@github.com/szuecs/go-gin-webapp@$(REPO_USER)/$(APP)@"
