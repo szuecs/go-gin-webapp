@@ -1,0 +1,6 @@
+.git
+scm-source.json
+Dockerfile.upstream
+*.aci
+vendor
+EXCLUDE

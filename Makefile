@@ -88,7 +88,7 @@ create.app: create.$(APP)
 
 create.$(APP):
 	mkdir -p $(DST)
-	rsync -a --exclude=.git $(GOPATH)/src/github.com/szuecs/go-gin-webapp/ $(DST)
+	rsync -a --exclude-from=EXCLUDE $(GOPATH)/src/github.com/szuecs/go-gin-webapp/ $(DST)
 	grep -rl github.com/szuecs/go-gin-webapp $(DST) | xargs $(SED) -i "s@github.com/szuecs/go-gin-webapp@$(REPO_USER)/$(APP)@"
 	grep -rl go-gin-webapp $(DST) | xargs $(SED) -i "s@go-gin-webapp@$(APP)@g"
 	mv $(DST)/cmd/go-gin-webapp $(DST)/cmd/$(APP)
@@ -97,6 +97,6 @@ create.$(APP):
 	cd $(DST); git init
 	cd $(DST); git add .
 	cd $(DST); git ci -m "init $(APP)"
-	go get -u github.com/Masterminds/glide/...
-	cd $(DST); glide i
-
+	@echo "=== install dependencies with:"
+	@echo "go get -u github.com/Masterminds/glide/..."
+	@echo "cd $(DST); glide i"
