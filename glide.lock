@@ -1,0 +1,76 @@
+hash: 2123980ddd9666190e9dd70820dda06aaa0b39c6feab806f34cf6f9cc562ad95
+updated: 2017-04-06T22:57:43.8276026+02:00
+imports:
+- name: github.com/alecthomas/template
+  version: a0175ee3bccc567396460bf5acd36800cb10c49c
+  subpackages:
+  - parse
+- name: github.com/alecthomas/units
+  version: 2efee857e7cfd4f3d0138cc3cbb1b4966962b93a
+- name: github.com/DeanThompson/ginpprof
+  version: 8c0e31bfeaa87bd40412ee8a8ba383f5f700ff72
+- name: github.com/gin-gonic/gin
+  version: e2212d40c62a98b388a5eb48ecbdcf88534688ba
+  subpackages:
+  - binding
+  - render
+- name: github.com/golang/glog
+  version: 23def4e6c14b4da8ac2ed8007337bc5eb5007998
+- name: github.com/golang/protobuf
+  version: 2402d76f3d41f928c7902a765dfc872356dd3aad
+  subpackages:
+  - proto
+- name: github.com/manucorporat/sse
+  version: ee05b128a739a0fb76c7ebd3ae4810c1de808d6d
+- name: github.com/mattn/go-isatty
+  version: fc9e8d8ef48496124e79ae0df75490096eccf6fe
+- name: github.com/szuecs/gin-glog
+  version: 889447754c9341143a101ccc6449d91d0b9ba57a
+- name: github.com/szuecs/gin-gomonitor
+  version: d94396047ba93c8c9d38345f3e4820616670b491
+- name: github.com/zalando/gin-oauth2
+  version: 60e21b8c80831d68accaa0fe9e69c2b7f38ba112
+  subpackages:
+  - zalando
+- name: golang.org/x/crypto
+  version: c2303dcbe84172e0c0da4c9f083eeca54c06f298
+  subpackages:
+  - ssh/terminal
+- name: golang.org/x/net
+  version: f315505cf3349909cdf013ea56690da34e96a451
+  subpackages:
+  - context
+  - publicsuffix
+- name: golang.org/x/oauth2
+  version: 7fdf09982454086d5570c7db3e11f360194830ca
+  subpackages:
+  - internal
+- name: golang.org/x/sys
+  version: 7de4796419dc3b554e6dab3a119a62469569d299
+  subpackages:
+  - unix
+- name: google.golang.org/appengine
+  version: 56d253d1dd14aa01937e12c73a0971bcfd797ff2
+  subpackages:
+  - internal
+  - internal/base
+  - internal/datastore
+  - internal/log
+  - internal/remote_api
+  - internal/urlfetch
+  - urlfetch
+- name: gopkg.in/alecthomas/kingpin.v2
+  version: e9044be3ab2a8e11d4e1f418d12f0790d57e8d70
+- name: gopkg.in/go-playground/validator.v8
+  version: c193cecd124b5cc722d7ee5538e945bdb3348435
+- name: gopkg.in/mcuadros/go-monitor.v1
+  version: b46e0cb50c9d4bd193bc1ebed8119f1f0b9a0aff
+  subpackages:
+  - aspects
+- name: gopkg.in/resty.v0
+  version: c45c7bcc0000d1a9ac1b119b2e6043c6540eedea
+- name: gopkg.in/yaml.v1
+  version: 9f9df34309c04878acc86042b16630b0f696e1de
+- name: gopkg.in/yaml.v2
+  version: a3f3340b5840cee44f372bddb5880fcbc419b46a
+testImports: []
