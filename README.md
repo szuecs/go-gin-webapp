@@ -6,11 +6,11 @@ similar to [this blogpost](http://txt.fliglio.com/2014/07/restful-microservices-
 It defaults the configuration to use https, if you configure the paths
 to Certificate and Key correctly.
 
-[Gin-gomonitor](https://github.com/zalando/gin-gomonitor)
+[Gin-gomonitor](https://github.com/szuecs/gin-gomonitor)
 provides default metrics and you can easily implement your own
 metrics, if you need.
 
-It uses [gin-glog](https://github.com/zalando/gin-glog)
+It uses [gin-glog](https://github.com/szuecs/gin-glog)
 middleware, which internally uses [glog](https://github.com/golang/glog) as
 logger. This provides you leveled Logs, commandline options and logs
 are flushed to disk in a separate goroutine with a configurable interval.

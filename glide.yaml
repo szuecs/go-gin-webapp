@@ -3,9 +3,9 @@ import:
 - package: github.com/DeanThompson/ginpprof
 - package: github.com/gin-gonic/gin
 - package: github.com/golang/glog
-- package: github.com/zalando/gin-glog
+- package: github.com/szuecs/gin-glog
   version: ^1.1.0
-- package: github.com/zalando/gin-gomonitor
+- package: github.com/szuecs/gin-gomonitor
   version: ^1.0.0
 - package: github.com/zalando/gin-oauth2
   version: ^1.4.0
