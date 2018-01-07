@@ -1,5 +1,5 @@
-hash: 2123980ddd9666190e9dd70820dda06aaa0b39c6feab806f34cf6f9cc562ad95
-updated: 2017-04-06T22:57:43.8276026+02:00
+hash: ea5ea6aad0c39588b5625503985ee802a0879ae39dbdb926cfde3d012cd66955
+updated: 2018-01-07T18:25:20.916234991+01:00
 imports:
 - name: github.com/alecthomas/template
   version: a0175ee3bccc567396460bf5acd36800cb10c49c
@@ -9,48 +9,56 @@ imports:
   version: 2efee857e7cfd4f3d0138cc3cbb1b4966962b93a
 - name: github.com/DeanThompson/ginpprof
   version: 8c0e31bfeaa87bd40412ee8a8ba383f5f700ff72
+- name: github.com/gin-contrib/sse
+  version: 22d885f9ecc78bf4ee5d72b937e4bbcdc58e8cae
 - name: github.com/gin-gonic/gin
-  version: e2212d40c62a98b388a5eb48ecbdcf88534688ba
+  version: a712f77d7aaec7eb4766a663924aaa4e54d3fe70
   subpackages:
   - binding
+  - json
   - render
 - name: github.com/golang/glog
-  version: 23def4e6c14b4da8ac2ed8007337bc5eb5007998
+  version: 44145f04b68cf362d9c4df2182967c2275eaefed
 - name: github.com/golang/protobuf
-  version: 2402d76f3d41f928c7902a765dfc872356dd3aad
+  version: 6a1fa9404c0aebf36c879bc50152edcc953910d2
   subpackages:
   - proto
-- name: github.com/manucorporat/sse
-  version: ee05b128a739a0fb76c7ebd3ae4810c1de808d6d
+- name: github.com/json-iterator/go
+  version: 0ab880662f61f7b74754bc1c778a512e388bee22
 - name: github.com/mattn/go-isatty
-  version: fc9e8d8ef48496124e79ae0df75490096eccf6fe
+  version: 6ca4dbf54d38eea1a992b3c722a76a5d1c4cb25c
 - name: github.com/szuecs/gin-glog
-  version: 889447754c9341143a101ccc6449d91d0b9ba57a
+  version: da59244bde84149ae00db0c2b8e62b9d899e6993
 - name: github.com/szuecs/gin-gomonitor
-  version: d94396047ba93c8c9d38345f3e4820616670b491
+  version: 52a62f5215c5f8058fd3745158b10db84f795d32
+- name: github.com/ugorji/go
+  version: ded73eae5db7e7a0ef6f55aace87a2873c5d2b74
+  subpackages:
+  - codec
 - name: github.com/zalando/gin-oauth2
   version: 60e21b8c80831d68accaa0fe9e69c2b7f38ba112
   subpackages:
   - zalando
 - name: golang.org/x/crypto
-  version: c2303dcbe84172e0c0da4c9f083eeca54c06f298
+  version: faadfbdc035307d901e69eea569f5dda451a3ee3
   subpackages:
   - ssh/terminal
 - name: golang.org/x/net
-  version: f315505cf3349909cdf013ea56690da34e96a451
+  version: f5079bd7f6f74e23c4d65efa0f4ce14cbd6a3c0f
   subpackages:
   - context
   - publicsuffix
 - name: golang.org/x/oauth2
-  version: 7fdf09982454086d5570c7db3e11f360194830ca
+  version: 3c3a985cb79f52a3190fbc056984415ca6763d01
   subpackages:
   - internal
 - name: golang.org/x/sys
-  version: 7de4796419dc3b554e6dab3a119a62469569d299
+  version: 739734461d1c916b6c72a63d7efda2b27edb369f
   subpackages:
   - unix
+  - windows
 - name: google.golang.org/appengine
-  version: 56d253d1dd14aa01937e12c73a0971bcfd797ff2
+  version: 4f7eeb5305a4ba1966344836ba4af9996b7b4e05
   subpackages:
   - internal
   - internal/base
@@ -60,17 +68,17 @@ imports:
   - internal/urlfetch
   - urlfetch
 - name: gopkg.in/alecthomas/kingpin.v2
-  version: e9044be3ab2a8e11d4e1f418d12f0790d57e8d70
+  version: 947dcec5ba9c011838740e680966fd7087a71d0d
 - name: gopkg.in/go-playground/validator.v8
-  version: c193cecd124b5cc722d7ee5538e945bdb3348435
+  version: 5f1438d3fca68893a817e4a66806cea46a9e4ebf
 - name: gopkg.in/mcuadros/go-monitor.v1
   version: b46e0cb50c9d4bd193bc1ebed8119f1f0b9a0aff
   subpackages:
   - aspects
 - name: gopkg.in/resty.v0
-  version: c45c7bcc0000d1a9ac1b119b2e6043c6540eedea
+  version: cf81ed0a604d373be63b4c036c6b05c06520615f
 - name: gopkg.in/yaml.v1
   version: 9f9df34309c04878acc86042b16630b0f696e1de
 - name: gopkg.in/yaml.v2
-  version: a3f3340b5840cee44f372bddb5880fcbc419b46a
+  version: 53feefa2559fb8dfa8d81baad31be332c97d6c77
 testImports: []

@@ -12,9 +12,9 @@ import (
 	"github.com/DeanThompson/ginpprof"
 	"github.com/gin-gonic/gin"
 	"github.com/golang/glog"
-	"github.com/szuecs/go-gin-webapp/conf"
 	"github.com/szuecs/gin-glog"
 	"github.com/szuecs/gin-gomonitor"
+	"github.com/szuecs/go-gin-webapp/conf"
 	"github.com/zalando/gin-oauth2"
 	"github.com/zalando/gin-oauth2/zalando"
 	"golang.org/x/oauth2"
@@ -57,7 +57,7 @@ func (svc *Service) Run(config *ServiceConfig) error {
 	router.Use(gin.Recovery())
 
 	// pass your custom aspects here to get them available
-	gomonitor.Metrics(cfg.MonitorPort, []aspects.Aspect{})
+	gomonitor.Start(cfg.MonitorPort, []aspects.Aspect{})
 
 	// OAuth2 secured if conf.Oauth2Enabled is set
 	var private *gin.RouterGroup
